@@ -123,17 +123,27 @@ app.use((err, req, res, next) => {
 });
 
 server.on("request", (req, res) => {
-  if (bareServer.shouldRoute(req)) {
-    bareServer.routeRequest(req, res);
-  } else {
-    app(req, res);
+  try {
+    if (bareServer.shouldRoute(req)) {
+      bareServer.routeRequest(req, res);
+    } else {
+      app(req, res);
+    }
+  } catch (error) {
+    console.error("Bare server request error:", error);
+    res.status(502).send("Bad Gateway");
   }
 });
 
 server.on("upgrade", (req, socket, head) => {
-  if (bareServer.shouldRoute(req)) {
-    bareServer.routeUpgrade(req, socket, head);
-  } else {
+  try {
+    if (bareServer.shouldRoute(req)) {
+      bareServer.routeUpgrade(req, socket, head);
+    } else {
+      socket.end();
+    }
+  } catch (error) {
+    console.error("Bare server upgrade error:", error);
     socket.end();
   }
 });
