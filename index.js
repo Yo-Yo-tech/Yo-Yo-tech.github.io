@@ -63,11 +63,13 @@ app.get("/e/*", async (req, res, next) => {
       return next();
     }
 
-    const asset = await fetch(reqTarget);
-    if (!asset.ok) {
+      const asset = await fetch(reqTarget);
+    
+    // Check if the asset exists and the fetch was successful
+    if (!asset || !asset.ok) {
+      console.error(`Failed to fetch asset from: ${reqTarget}, Status: ${asset ? asset.status : 'No response'}`);
       return next();
     }
-
     const data = Buffer.from(await asset.arrayBuffer());
     const ext = path.extname(reqTarget);
     const no = [".unityweb"];
